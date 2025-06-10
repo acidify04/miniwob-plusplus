@@ -186,13 +186,15 @@ class SeleniumInstance(Thread):
             self.index
         )
         options = webdriver.ChromeOptions()
+        
         if self.headless:
-            options.add_argument("headless")
+            #options.add_argument("headless=new")
             options.add_argument("disable-gpu")
             options.add_argument("no-sandbox")
         else:
             options.add_argument("app=" + self.url)
-        self.driver = webdriver.Chrome(options=options)
+        service = Service(executable_path="/usr/bin/chromedriver")
+        self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.implicitly_wait(5)
         if self.headless:
             self.driver.get(self.url)
