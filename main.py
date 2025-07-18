@@ -5,7 +5,7 @@ from miniwob.action import ActionTypes
 
 gymnasium.register_envs(miniwob)
 
-env = gymnasium.make('miniwob/click-test-2-v1', render_mode=None)
+env = gymnasium.make('miniwob/click-test', render_mode=None)
 
 rewards = []
 
@@ -14,8 +14,8 @@ try:
     for i in range(10):
         # Start a new episode.
         obs, info = env.reset()
-        assert obs["utterance"] == "Click button ONE."
-        assert obs["fields"] == (("target", "ONE"),)
+        assert obs["utterance"] == "Click the button."
+        # assert obs["fields"] == (("target", "ONE"),)
         time.sleep(2)       # Only here to let you look at the environment.
         
         # Find the HTML element with text "ONE".
