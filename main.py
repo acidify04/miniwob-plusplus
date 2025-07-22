@@ -11,16 +11,19 @@ rewards = []
 
 # Wrap the code in try-finally to ensure proper cleanup.
 try:
-    for i in range(10):
+    for i in range(3):
         # Start a new episode.
         obs, info = env.reset()
         assert obs["utterance"] == "Click the button."
+        print(obs["utterance"])
+        print(obs["dom_elements"])
+        #print(obs["screenshot"])
         # assert obs["fields"] == (("target", "ONE"),)
         time.sleep(2)       # Only here to let you look at the environment.
         
         # Find the HTML element with text "ONE".
         for element in obs["dom_elements"]:
-            if element["text"] == "ONE":
+            if element["text"] == "TWO":
                 break
 
         # Click on the element.
