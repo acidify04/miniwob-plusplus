@@ -26,7 +26,7 @@ class MiniWoBEnvironment(gym.Env):
         subdomain: Optional[str] = None,
         render_mode: Optional[str] = None,
         base_url: Optional[str] = None,
-        action_space_config: Union[str, ActionSpaceConfig] = "all_supported",
+        action_space_config: Union[str, ActionSpaceConfig] = "test",
         field_extractor: Optional[FieldExtractor] = None,
         reward_processor: Optional[RewardProcessor] = None,
         wait_ms: float = 0.0,
@@ -234,6 +234,7 @@ class MiniWoBEnvironment(gym.Env):
             An action from the action space.
         """
         action = self.action_space.sample()
+        print(action)
         if isinstance(action_type, (str, ActionTypes)):
             action["action_type"] = self.action_space_config.action_types.index(
                 action_type
@@ -248,4 +249,5 @@ class MiniWoBEnvironment(gym.Env):
             if key not in action:
                 raise KeyError(f"Key {key} not in valid action keys {list(action)}.")
             action[key] = value
+        print(action)
         return action

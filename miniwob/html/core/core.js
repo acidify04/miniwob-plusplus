@@ -539,11 +539,11 @@ core.canvasDrawClick = function (event) {
   if (!event.isTrusted || event.pageX > 160 || event.pageY > 210) return;
   // Draw!
   if (!core.prepareCanvas()) return;
-  var ctx = core.clickTrackCtx;
-  ctx.beginPath();
-  ctx.arc(event.pageX, event.pageY, 5, 0,2*Math.PI);
-  ctx.fillStyle = "rgba(100, 100, 255, 0.8)";
-  ctx.fill();
+  // var ctx = core.clickTrackCtx;
+  // ctx.beginPath();
+  // ctx.arc(event.pageX, event.pageY, 5, 0,2*Math.PI);
+  // ctx.fillStyle = "rgba(100, 100, 255, 0.8)";
+  // ctx.fill();
 }
 
 core.canvasDrawElementClick = function (element) {

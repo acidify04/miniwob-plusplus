@@ -25,16 +25,18 @@ def _get_move_coords_action_chains(left: float, top: float, driver: ChromeDriver
     return chain
 
 
-def execute_move_coords(left: float, top: float, driver: ChromeDriver):
-    """Move to coordinates (left, top)."""
-    chain = _get_move_coords_action_chains(left, top, driver)
-    chain.w3c_actions.perform()
+# def execute_move_coords(left: float, top: float, driver: ChromeDriver):
+#     """Move to coordinates (left, top)."""
+#     chain = _get_move_coords_action_chains(left, top, driver)
+#     chain.w3c_actions.perform()
 
 
 def execute_click_coords(left: float, top: float, driver: ChromeDriver):
-    """Click at coordinates (left, top)."""
-    chain = _get_move_coords_action_chains(left, top, driver)
-    chain.w3c_actions.pointer_action.click()
+    """Move mouse to coordinates (left, top) and click there."""
+    chain = ActionChains(driver, duration=0)
+    chain.w3c_actions.pointer_action.move_to_location(left, top)
+    chain.w3c_actions.pointer_action.click_and_hold()
+    chain.w3c_actions.pointer_action.release()
     chain.w3c_actions.perform()
 
 
@@ -125,6 +127,15 @@ def execute_type_text(text: str, driver: ChromeDriver):
         chain.w3c_actions.key_action.key_up(key)
     chain.perform()
 
+def execute_move_coords(x, y, driver):
+    # 기존 마우스 이동 수행
+    actions = ActionChains(driver)
+    actions.move_by_offset(x, y).perform()
+
+    # JS로 fake-cursor 이동
+    js = f"window.moveMouse({x}, {y});"
+    driver.execute_script(js)
+
 
 _SELENIUM_COORDS_ACTIONS = {
     ActionTypes.MOVE_COORDS: execute_move_coords,
@@ -146,6 +157,10 @@ def execute_action_on_chromedriver(
     if action_type == ActionTypes.NONE:
         return
     # Coords actions
+    if action_type == ActionTypes.MOVE_COORDS:
+        left, top = config.compute_raw_coords(action)
+        execute_move_coords(left, top, driver)
+        return
     if action_type in COORDS_ACTIONS:
         left, top = config.compute_raw_coords(action)
         if action_type in SCROLL_ACTIONS:

@@ -29,7 +29,7 @@ class ActionTypes(str, Enum):
     # Mouse actions with coordinates
     MOVE_COORDS = "MOVE_COORDS"
     CLICK_COORDS = "CLICK_COORDS"
-    DBLCLICK_COORDS = "DBLCLICK_COORDS"
+    DBLCLICK_COORDS = "DBL"
     MOUSEDOWN_COORDS = "MOUSEDOWN_COORDS"
     MOUSEUP_COORDS = "MOUSEUP_COORDS"
     # Mouse wheel
@@ -190,6 +190,14 @@ class ActionSpaceConfig:
                 ],
                 coord_bins=(51, 51),
                 allowed_keys=allowed_keys,
+            )
+        elif name == "test":
+            return cls(
+                action_types=[
+                    ActionTypes.NONE,
+                    ActionTypes.MOVE_COORDS,
+                    ActionTypes.CLICK_COORDS,
+                ]
             )
         else:
             raise ValueError(f"Unknown preset name {name}")

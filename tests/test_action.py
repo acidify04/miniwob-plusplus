@@ -17,9 +17,9 @@ class RepeatedTester:
     """Base class for repeated testing on a single task."""
 
     # Environment name; subclasses should set this field
-    ENV_NAME = ""
+    ENV_NAME = "click-test"
     # Action space config preset name
-    ACTION_SPACE_PRESET_NAME = "all_supported"
+    ACTION_SPACE_PRESET_NAME = "test"
     # Number of times to run the test
     N = 10
     # Maximum number of steps for each episode

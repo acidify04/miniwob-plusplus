@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Custom Click Task</title>
+<!-- stylesheets -->
+<link rel="stylesheet" type="text/css" href="../core/core.css">
+<!-- JS -->
+<script src="./core/core.js"></script>
+<script src="./core/d3.v3.min.js"></script>
+<script src="./common/ui_utils.js"></script>
+
+<style>
+#subbtn { width: 40px; height: 40px; }
+
+#fake-cursor {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  z-index: 9999;
+  pointer-events: none;
+}
+</style>
+
+<script>
+function moveMouse(x, y) {
+  var evt = new MouseEvent('mousemove', {
+    clientX: x,
+    clientY: y,
+    bubbles: true,
+    cancelable: true,
+    view: window
+  });
+  document.dispatchEvent(evt);
+}
+
+var genProblem = function() {
+  var w = core.randi(35, 100);
+  var L = core.randi(0, 160 - w - 2);
+  var U = core.randi(0, 160 - w - 2);
+
+  var btn = d3.select('#subbtn');
+  btn.attr('style', 'margin-left:'+L+'px; margin-top:'+U+'px; width:'+w+'px; height:'+w+'px;');
+  btn.on('click', function(){ core.endEpisode(1.0, true); });
+}
+
+// 마우스 커서 위치를 업데이트하는 함수
+function moveCursor(x, y) {
+  const cursor = document.getElementById('fake-cursor');
+  if (cursor) {
+    cursor.style.left = `${x}px`;
+    cursor.style.top = `${y}px`;
+  }
+}
+
+// 외부에서 호출할 수 있게 전역으로 노출
+window.moveMouse = moveCursor;
+
+window.onload = function() {
+  core.startEpisode();
+}
+</script>
+</head>
+<body>
+<div id="wrap">
+  <div id="query">Click the button.</div>
+  <div id="area">
+    <button id="subbtn">Click Me!</button>
+  </div>
+</div>
+
+<!-- 시각화용 가짜 커서 -->
+<div id="fake-cursor"></div>
+
+</body>
+</html>

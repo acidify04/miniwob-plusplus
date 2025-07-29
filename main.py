@@ -2,10 +2,12 @@ import time
 import gymnasium
 import miniwob
 from miniwob.action import ActionTypes
+from miniwob.reward import get_binary_reward
+from tests.test_action import RepeatedTester
 
 gymnasium.register_envs(miniwob)
 
-env = gymnasium.make('miniwob/click-test', render_mode=None)
+env = gymnasium.make('miniwob/click-test', render_mode=None, reward_processor=get_binary_reward)
 
 rewards = []
 
