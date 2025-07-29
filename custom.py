@@ -39,14 +39,11 @@ try:
             ActionTypes.MOVE_COORDS, coords=np.array([click_x, click_y], dtype=np.float64)
             )
         observation, reward, terminated, truncated, info = env.step(action)
-        env.render()
         time.sleep(0.5)
 
         action = env.unwrapped.create_action(ActionTypes.CLICK_COORDS, coords=np.array([click_x, click_y], dtype=np.float64))
         observation, reward, terminated, truncated, info = env.step(action)
         #print(reward)
-        env.render()
-        click_reward += reward
     
     # Check if the action was correct. 
         assert reward >= 0
