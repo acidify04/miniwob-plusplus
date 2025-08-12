@@ -234,7 +234,7 @@ class MiniWoBEnvironment(gym.Env):
             An action from the action space.
         """
         action = self.action_space.sample()
-        print(action)
+        #print(action)
         if isinstance(action_type, (str, ActionTypes)):
             action["action_type"] = self.action_space_config.action_types.index(
                 action_type
@@ -249,5 +249,5 @@ class MiniWoBEnvironment(gym.Env):
             if key not in action:
                 raise KeyError(f"Key {key} not in valid action keys {list(action)}.")
             action[key] = value
-        print(action)
+        #print(action)
         return action

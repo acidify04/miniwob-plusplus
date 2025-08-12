@@ -7,7 +7,7 @@ import random
 
 # Import `custom_registry.py` above to register the task.
 import custom_registry
-gymnasium.register_envs(custom_registry)
+#gymnasium.register_envs(custom_registry)
 
 # Create an environment.
 env = gymnasium.make('miniwob/custom-v0', render_mode='human')
