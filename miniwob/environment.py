@@ -26,7 +26,7 @@ class MiniWoBEnvironment(gym.Env):
         subdomain: Optional[str] = None,
         render_mode: Optional[str] = None,
         base_url: Optional[str] = None,
-        action_space_config: Union[str, ActionSpaceConfig] = "test",
+        action_space_config: Union[str, ActionSpaceConfig] = "all_supported",
         field_extractor: Optional[FieldExtractor] = None,
         reward_processor: Optional[RewardProcessor] = None,
         wait_ms: float = 0.0,
