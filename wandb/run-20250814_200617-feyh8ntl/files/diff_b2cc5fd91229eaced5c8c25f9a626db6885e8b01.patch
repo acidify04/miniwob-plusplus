@@ -1,0 +1,345 @@
+diff --git a/click_model_cnn.zip b/click_model_cnn.zip
+new file mode 100644
+index 0000000..24b63d8
+Binary files /dev/null and b/click_model_cnn.zip differ
+diff --git a/custom.py b/custom.py
+index aea7e50..0f49a49 100644
+--- a/custom.py
++++ b/custom.py
+@@ -7,7 +7,7 @@ import random
+ 
+ # Import `custom_registry.py` above to register the task.
+ import custom_registry
+-gymnasium.register_envs(custom_registry)
++#gymnasium.register_envs(custom_registry)
+ 
+ # Create an environment.
+ env = gymnasium.make('miniwob/custom-v0', render_mode='human')
+diff --git a/custom_registry.py b/custom_registry.py
+deleted file mode 100644
+index 62ae241..0000000
+--- a/custom_registry.py
++++ /dev/null
+@@ -1,15 +0,0 @@
+-import pathlib
+-from gymnasium.envs.registration import register
+-from miniwob.fields import create_regex_field_extractor
+-
+-register(
+-    id='miniwob/custom-v0',
+-    entry_point='miniwob.environment:MiniWoBEnvironment',
+-    kwargs={
+-        'subdomain': 'custom-click',
+-        'base_url': 'file:///home/cau/Documents/miniwob-plusplus/miniwob/html/',
+-        'field_extractor': create_regex_field_extractor(
+-            r'Click the button\.', ['amount'],
+-        )
+-    }
+-)
+diff --git a/main.py b/main.py
+index 32cfdeb..f199883 100644
+--- a/main.py
++++ b/main.py
+@@ -2,12 +2,10 @@ import time
+ import gymnasium
+ import miniwob
+ from miniwob.action import ActionTypes
+-from miniwob.reward import get_binary_reward
+-from tests.test_action import RepeatedTester
+ 
+ gymnasium.register_envs(miniwob)
+ 
+-env = gymnasium.make('miniwob/click-test', render_mode=None, reward_processor=get_binary_reward)
++env = gymnasium.make('miniwob/click-test', render_mode=None)
+ 
+ rewards = []
+ 
+@@ -45,4 +43,4 @@ finally:
+     for reward in rewards:
+         sum += reward
+     print(f'Average reward: {sum/10}')
+-    env.close()
++    env.close()
+\ No newline at end of file
+diff --git a/miniwob/action.py b/miniwob/action.py
+index 82faeb8..35378a7 100644
+--- a/miniwob/action.py
++++ b/miniwob/action.py
+@@ -29,7 +29,7 @@ class ActionTypes(str, Enum):
+     # Mouse actions with coordinates
+     MOVE_COORDS = "MOVE_COORDS"
+     CLICK_COORDS = "CLICK_COORDS"
+-    DBLCLICK_COORDS = "DBL"
++    DBLCLICK_COORDS = "DBLCLICK_COORDS"
+     MOUSEDOWN_COORDS = "MOUSEDOWN_COORDS"
+     MOUSEUP_COORDS = "MOUSEUP_COORDS"
+     # Mouse wheel
+@@ -191,14 +191,6 @@ class ActionSpaceConfig:
+                 coord_bins=(51, 51),
+                 allowed_keys=allowed_keys,
+             )
+-        elif name == "test":
+-            return cls(
+-                action_types=[
+-                    ActionTypes.NONE,
+-                    ActionTypes.MOVE_COORDS,
+-                    ActionTypes.CLICK_COORDS,
+-                ]
+-            )
+         else:
+             raise ValueError(f"Unknown preset name {name}")
+ 
+diff --git a/miniwob/environment.py b/miniwob/environment.py
+index 0960588..cb2f33d 100644
+--- a/miniwob/environment.py
++++ b/miniwob/environment.py
+@@ -26,7 +26,7 @@ class MiniWoBEnvironment(gym.Env):
+         subdomain: Optional[str] = None,
+         render_mode: Optional[str] = None,
+         base_url: Optional[str] = None,
+-        action_space_config: Union[str, ActionSpaceConfig] = "test",
++        action_space_config: Union[str, ActionSpaceConfig] = "all_supported",
+         field_extractor: Optional[FieldExtractor] = None,
+         reward_processor: Optional[RewardProcessor] = None,
+         wait_ms: float = 0.0,
+@@ -234,7 +234,7 @@ class MiniWoBEnvironment(gym.Env):
+             An action from the action space.
+         """
+         action = self.action_space.sample()
+-        print(action)
++        #print(action)
+         if isinstance(action_type, (str, ActionTypes)):
+             action["action_type"] = self.action_space_config.action_types.index(
+                 action_type
+@@ -249,5 +249,5 @@ class MiniWoBEnvironment(gym.Env):
+             if key not in action:
+                 raise KeyError(f"Key {key} not in valid action keys {list(action)}.")
+             action[key] = value
+-        print(action)
++        #print(action)
+         return action
+diff --git a/miniwob/html/core/core.js b/miniwob/html/core/core.js
+index c5cd5aa..08f57ff 100644
+--- a/miniwob/html/core/core.js
++++ b/miniwob/html/core/core.js
+@@ -539,11 +539,11 @@ core.canvasDrawClick = function (event) {
+   if (!event.isTrusted || event.pageX > 160 || event.pageY > 210) return;
+   // Draw!
+   if (!core.prepareCanvas()) return;
+-  // var ctx = core.clickTrackCtx;
+-  // ctx.beginPath();
+-  // ctx.arc(event.pageX, event.pageY, 5, 0,2*Math.PI);
+-  // ctx.fillStyle = "rgba(100, 100, 255, 0.8)";
+-  // ctx.fill();
++  var ctx = core.clickTrackCtx;
++  ctx.beginPath();
++  ctx.arc(event.pageX, event.pageY, 5, 0,2*Math.PI);
++  ctx.fillStyle = "rgba(100, 100, 255, 0.8)";
++  ctx.fill();
+ }
+ 
+ core.canvasDrawElementClick = function (element) {
+diff --git a/miniwob/selenium_actions.py b/miniwob/selenium_actions.py
+index f6386df..c4c1873 100644
+--- a/miniwob/selenium_actions.py
++++ b/miniwob/selenium_actions.py
+@@ -25,18 +25,16 @@ def _get_move_coords_action_chains(left: float, top: float, driver: ChromeDriver
+     return chain
+ 
+ 
+-# def execute_move_coords(left: float, top: float, driver: ChromeDriver):
+-#     """Move to coordinates (left, top)."""
+-#     chain = _get_move_coords_action_chains(left, top, driver)
+-#     chain.w3c_actions.perform()
++def execute_move_coords(left: float, top: float, driver: ChromeDriver):
++    """Move to coordinates (left, top)."""
++    chain = _get_move_coords_action_chains(left, top, driver)
++    chain.w3c_actions.perform()
+ 
+ 
+ def execute_click_coords(left: float, top: float, driver: ChromeDriver):
+-    """Move mouse to coordinates (left, top) and click there."""
+-    chain = ActionChains(driver, duration=0)
+-    chain.w3c_actions.pointer_action.move_to_location(left, top)
+-    chain.w3c_actions.pointer_action.click_and_hold()
+-    chain.w3c_actions.pointer_action.release()
++    """Click at coordinates (left, top)."""
++    chain = _get_move_coords_action_chains(left, top, driver)
++    chain.w3c_actions.pointer_action.click()
+     chain.w3c_actions.perform()
+ 
+ 
+@@ -127,15 +125,6 @@ def execute_type_text(text: str, driver: ChromeDriver):
+         chain.w3c_actions.key_action.key_up(key)
+     chain.perform()
+ 
+-def execute_move_coords(x, y, driver):
+-    # 기존 마우스 이동 수행
+-    actions = ActionChains(driver)
+-    actions.move_by_offset(x, y).perform()
+-
+-    # JS로 fake-cursor 이동
+-    js = f"window.moveMouse({x}, {y});"
+-    driver.execute_script(js)
+-
+ 
+ _SELENIUM_COORDS_ACTIONS = {
+     ActionTypes.MOVE_COORDS: execute_move_coords,
+@@ -157,10 +146,6 @@ def execute_action_on_chromedriver(
+     if action_type == ActionTypes.NONE:
+         return
+     # Coords actions
+-    if action_type == ActionTypes.MOVE_COORDS:
+-        left, top = config.compute_raw_coords(action)
+-        execute_move_coords(left, top, driver)
+-        return
+     if action_type in COORDS_ACTIONS:
+         left, top = config.compute_raw_coords(action)
+         if action_type in SCROLL_ACTIONS:
+diff --git a/miniwob/selenium_instance.py b/miniwob/selenium_instance.py
+index 34aacdf..6bbb3f0 100644
+--- a/miniwob/selenium_instance.py
++++ b/miniwob/selenium_instance.py
+@@ -190,7 +190,7 @@ class SeleniumInstance(Thread):
+         options = webdriver.ChromeOptions()
+         
+         if self.headless:
+-            # options.add_argument("headless=new")
++            #options.add_argument("headless=new")
+             options.add_argument("disable-gpu")
+             options.add_argument("no-sandbox")
+         else:
+diff --git a/ppo_wob_tensorboard/PPO_1/events.out.tfevents.1754976615.cau-System-Product-Name.79568.0 b/ppo_wob_tensorboard/PPO_1/events.out.tfevents.1754976615.cau-System-Product-Name.79568.0
+new file mode 100644
+index 0000000..897374d
+Binary files /dev/null and b/ppo_wob_tensorboard/PPO_1/events.out.tfevents.1754976615.cau-System-Product-Name.79568.0 differ
+diff --git a/ppo_wob_tensorboard/PPO_2/events.out.tfevents.1754976751.cau-System-Product-Name.80768.0 b/ppo_wob_tensorboard/PPO_2/events.out.tfevents.1754976751.cau-System-Product-Name.80768.0
+new file mode 100644
+index 0000000..7f6b436
+Binary files /dev/null and b/ppo_wob_tensorboard/PPO_2/events.out.tfevents.1754976751.cau-System-Product-Name.80768.0 differ
+diff --git a/tests/test_action.py b/tests/test_action.py
+index 26ab4e7..c872224 100644
+--- a/tests/test_action.py
++++ b/tests/test_action.py
+@@ -17,9 +17,9 @@ class RepeatedTester:
+     """Base class for repeated testing on a single task."""
+ 
+     # Environment name; subclasses should set this field
+-    ENV_NAME = "click-test"
++    ENV_NAME = ""
+     # Action space config preset name
+-    ACTION_SPACE_PRESET_NAME = "test"
++    ACTION_SPACE_PRESET_NAME = "all_supported"
+     # Number of times to run the test
+     N = 10
+     # Maximum number of steps for each episode
+diff --git a/train_custom.py b/train_custom.py
+new file mode 100644
+index 0000000..a4e4c82
+--- /dev/null
++++ b/train_custom.py
+@@ -0,0 +1,104 @@
++import gymnasium as gym
++import numpy as np
++from gymnasium import spaces
++from miniwob.action import ActionTypes
++import custom_registry
++import wandb
++from wandb.integration.sb3 import WandbCallback
++
++from stable_baselines3 import PPO
++from stable_baselines3.common.env_util import make_vec_env
++from stable_baselines3.common.vec_env import VecTransposeImage
++
++class MiniWoBClickImageEnv(gym.Env):
++    def __init__(self):
++        super().__init__()
++        self.env = gym.make('miniwob/custom-v0')
++
++        # screenshot 크기
++        sample_obs, _ = self.env.reset()
++        h, w, c = sample_obs['screenshot'].shape
++
++        self.height = h
++        self.width = w
++
++        self.observation_space = spaces.Box(
++            low=0, high=255,
++            shape=(h, w, c),
++            dtype=np.uint8
++        )
++
++        # 클릭 좌표 (정규화된 x, y)
++        self.action_space = spaces.Box(
++            low=0.0, high=1.0,
++            shape=(2,),
++            dtype=np.float32
++        )
++
++    def reset(self, seed=None, options=None):
++        obs, info = self.env.reset(seed=seed, options=options)
++        return obs['screenshot'], info
++
++    def step(self, action):
++        coords = np.array([action[0] * self.width, action[1] * self.height], dtype=np.float32)
++
++        move_action = self.env.unwrapped.create_action(
++            ActionTypes.MOVE_COORDS, coords=coords
++        )
++        self.env.step(move_action)
++
++        click_action = self.env.unwrapped.create_action(
++            ActionTypes.CLICK_COORDS, coords=coords
++        )
++        obs, reward, terminated, truncated, info = self.env.step(click_action)
++
++        return obs['screenshot'], reward, terminated, truncated, info
++
++    def close(self):
++        self.env.close()
++
++wandb.init(
++    project="miniwob-click",   # W&B 프로젝트 이름
++    config={                  # 하이퍼파라미터 기록
++        "policy_type": "CnnPolicy",
++        "total_timesteps": 10000,
++        "env_name": "MiniWoBClickImageEnv",
++        "n_envs": 8,
++        "learning_rate": 5e-5,
++        "ent_coef": 0.01
++    },
++    sync_tensorboard=True,     # tensorboard 로그도 같이 동기화
++    monitor_gym=True,          # gym 환경 모니터링
++    save_code=True             # 코드도 자동 저장
++)
++
++# 벡터화된 환경 생성
++env = make_vec_env(MiniWoBClickImageEnv, n_envs=1)
++
++# (H, W, C) → (C, H, W) 변환
++env = VecTransposeImage(env)
++
++# CNN Policy로 학습
++model = PPO("CnnPolicy", env, verbose=2, n_steps=256, tensorboard_log="./ppo_wob_tensorboard/")
++model.learn(
++    total_timesteps=100000,
++    callback=WandbCallback(
++        gradient_save_freq=100,
++        model_save_path=f"models/{wandb.run.id}", # 학습된 모델도 W&B에 업로드
++        verbose=2
++    )
++)
++model.save("click_model_cnn")
++
++env = make_vec_env(MiniWoBClickImageEnv, n_envs=256)
++env = VecTransposeImage(env)
++
++model = PPO.load("click_model_cnn", env=env)
++
++obs = env.reset()
++done = False
++while not done:
++    action, _ = model.predict(obs)
++    obs, reward, done, info = env.step(action)
++    env.render()
++env.close()

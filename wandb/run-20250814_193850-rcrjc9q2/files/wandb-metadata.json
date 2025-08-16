@@ -1,0 +1,40 @@
+{
+  "os": "Linux-6.8.0-65-generic-x86_64-with-glibc2.35",
+  "python": "CPython 3.10.12",
+  "startedAt": "2025-08-14T10:38:50.577593Z",
+  "program": "/home/cau/Documents/miniwob-plusplus/train_custom.py",
+  "codePath": "train_custom.py",
+  "codePathLocal": "train_custom.py",
+  "git": {
+    "remote": "https://github.com/acidify04/miniwob-plusplus.git",
+    "commit": "5a60881ebf4055813c4b8e1029db4cc5d2c1e5b9"
+  },
+  "email": "parkeh0724@gmail.com",
+  "root": "/home/cau/Documents/miniwob-plusplus",
+  "host": "cau-System-Product-Name",
+  "executable": "/usr/bin/python3",
+  "cpu_count": 8,
+  "cpu_count_logical": 16,
+  "gpu": "NVIDIA GeForce RTX 5070 Ti",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "1006447816704",
+      "used": "98796949504"
+    }
+  },
+  "memory": {
+    "total": "32751321088"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 5070 Ti",
+      "memoryTotal": "17094934528",
+      "cudaCores": 8960,
+      "architecture": "Blackwell",
+      "uuid": "GPU-3a0449ef-6e37-2919-d5ed-03db0e423c3a"
+    }
+  ],
+  "cudaVersion": "12.9",
+  "writerId": "57eprk32z3agsp3i9oa4lhirklcn7lvy"
+}

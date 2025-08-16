@@ -1,0 +1,150 @@
+diff --git a/click_model_cnn.zip b/click_model_cnn.zip
+index 27ced48..24b63d8 100644
+Binary files a/click_model_cnn.zip and b/click_model_cnn.zip differ
+diff --git a/train_custom.py b/train_custom.py
+index 3a808ef..a720315 100644
+--- a/train_custom.py
++++ b/train_custom.py
+@@ -7,7 +7,12 @@ import custom_registry
+ from stable_baselines3 import PPO
+ from stable_baselines3.common.env_util import make_vec_env
+ from stable_baselines3.common.vec_env import VecTransposeImage
++import wandb
++from wandb.integration.sb3 import WandbCallback
+ 
++# ----------------------------
++# Custom Environment
++# ----------------------------
+ class MiniWoBClickImageEnv(gym.Env):
+     def __init__(self):
+         super().__init__()
+@@ -16,21 +21,14 @@ class MiniWoBClickImageEnv(gym.Env):
+         # screenshot 크기
+         sample_obs, _ = self.env.reset()
+         h, w, c = sample_obs['screenshot'].shape
+-
+-        self.height = h
+-        self.width = w
++        self.height, self.width = h, w
+ 
+         self.observation_space = spaces.Box(
+-            low=0, high=255,
+-            shape=(h, w, c),
+-            dtype=np.uint8
++            low=0, high=255, shape=(h, w, c), dtype=np.uint8
+         )
+-
+-        # 클릭 좌표 (정규화된 x, y)
++        # 클릭 좌표 (정규화)
+         self.action_space = spaces.Box(
+-            low=0.0, high=1.0,
+-            shape=(2,),
+-            dtype=np.float32
++            low=0.0, high=1.0, shape=(2,), dtype=np.float32
+         )
+ 
+     def reset(self, seed=None, options=None):
+@@ -40,42 +38,75 @@ class MiniWoBClickImageEnv(gym.Env):
+     def step(self, action):
+         coords = np.array([action[0] * self.width, action[1] * self.height], dtype=np.float32)
+ 
+-        move_action = self.env.unwrapped.create_action(
+-            ActionTypes.MOVE_COORDS, coords=coords
+-        )
++        # Move
++        move_action = self.env.unwrapped.create_action(ActionTypes.MOVE_COORDS, coords=coords)
+         self.env.step(move_action)
+ 
+-        click_action = self.env.unwrapped.create_action(
+-            ActionTypes.CLICK_COORDS, coords=coords
+-        )
++        # Click
++        click_action = self.env.unwrapped.create_action(ActionTypes.CLICK_COORDS, coords=coords)
+         obs, reward, terminated, truncated, info = self.env.step(click_action)
+ 
++        # ----------------------------
++        # Reward shaping: 클릭 위치와 target 간 거리 기반 보너스
++        # ----------------------------
++        if 'goal' in info:  # 환경이 목표 좌표를 info로 준다고 가정
++            goal_coords = np.array(info['goal'])
++            dist = np.linalg.norm(coords - goal_coords)
++            max_dist = np.linalg.norm([self.width, self.height])
++            shaped_reward = max(0, 1 - dist / max_dist)
++            reward += shaped_reward * 0.5  # reward shaping 비중
+         return obs['screenshot'], reward, terminated, truncated, info
+ 
+     def close(self):
+         self.env.close()
+ 
+-
+-# 벡터화된 환경 생성
+-env = make_vec_env(MiniWoBClickImageEnv, n_envs=1)
+-
+-# (H, W, C) → (C, H, W) 변환
++# ----------------------------
++# W&B 초기화
++# ----------------------------
++wandb.init(
++    project="miniwob-click",
++    config={
++        "policy_type": "CnnPolicy",
++        "total_timesteps": 100000,
++        "n_envs": 8,
++        "learning_rate": 5e-5,
++        "ent_coef": 0.01
++    },
++    sync_tensorboard=True,
++    monitor_gym=True,
++    save_code=True
++)
++
++# ----------------------------
++# Vectorized 환경
++# ----------------------------
++env = make_vec_env(MiniWoBClickImageEnv, n_envs=8)
+ env = VecTransposeImage(env)
+ 
+-# # CNN Policy로 학습
+-# model = PPO("CnnPolicy", env, verbose=1, tensorboard_log="./ppo_wob_tensorboard/")
+-# model.learn(total_timesteps=10000)
+-# model.save("click_model_cnn")
+-
+-# env = make_vec_env(MiniWoBClickImageEnv, n_envs=256)
+-# env = VecTransposeImage(env)
+-
+-model = PPO.load("click_model_cnn", env=env)
+-
+-obs = env.reset()
+-done = False
+-while not done:
+-    action, _ = model.predict(obs)
+-    obs, reward, done, info = env.step(action)
+-    env.render()
+-env.close()
++# ----------------------------
++# PPO 모델
++# ----------------------------
++model = PPO(
++    "CnnPolicy",
++    env,
++    verbose=1,
++    learning_rate=5e-5,
++    n_steps=256,         # 더 자주 업데이트
++    ent_coef=0.01,       # exploration 강화
++    batch_size=64,
++    gamma=0.95,
++    tensorboard_log="./ppo_wob_tensorboard/"
++)
++
++# ----------------------------
++# 학습
++# ----------------------------
++model.learn(
++    total_timesteps=100000,
++    callback=WandbCallback(
++        gradient_save_freq=100,
++        model_save_path=f"models/{wandb.run.id}",
++        verbose=2
++    )
++)
++model.save("click_model_cnn")

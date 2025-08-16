@@ -1,0 +1,237 @@
+_current_progress_remaining:
+    value: 1
+_custom_logger:
+    value: "False"
+_episode_num:
+    value: 0
+_last_episode_starts:
+    value: '[ True]'
+_last_obs:
+    value: |-
+        [[[[255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]
+           ...
+           [255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]]
+
+          [[255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]
+           ...
+           [255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]]
+
+          [[  0   0   0 ...   0   0   0]
+           [  0   0   0 ...   0   0   0]
+           [  0   0   0 ...   0   0   0]
+           ...
+           [255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]
+           [255 255 255 ... 255 255 255]]]]
+_last_original_obs:
+    value: None
+_logger:
+    value: <stable_baselines3.common.logger.Logger object at 0x7ac6dfdfaf80>
+_n_updates:
+    value: 0
+_num_timesteps_at_start:
+    value: 0
+_stats_window_size:
+    value: 100
+_total_timesteps:
+    value: 10000
+_vec_normalize_env:
+    value: None
+_wandb:
+    value:
+        cli_version: 0.21.1
+        code_path: code/train_custom.py
+        e:
+            wxfkm607wdkmu71u8cvudpnoinkkljsh:
+                codePath: train_custom.py
+                codePathLocal: train_custom.py
+                cpu_count: 8
+                cpu_count_logical: 16
+                cudaVersion: "12.9"
+                disk:
+                    /:
+                        total: "1006447816704"
+                        used: "98747662336"
+                email: parkeh0724@gmail.com
+                executable: /usr/bin/python3
+                git:
+                    commit: 5a60881ebf4055813c4b8e1029db4cc5d2c1e5b9
+                    remote: https://github.com/acidify04/miniwob-plusplus.git
+                gpu: NVIDIA GeForce RTX 5070 Ti
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Blackwell
+                      cudaCores: 8960
+                      memoryTotal: "17094934528"
+                      name: NVIDIA GeForce RTX 5070 Ti
+                      uuid: GPU-3a0449ef-6e37-2919-d5ed-03db0e423c3a
+                host: cau-System-Product-Name
+                memory:
+                    total: "32751321088"
+                os: Linux-6.8.0-65-generic-x86_64-with-glibc2.35
+                program: /home/cau/Documents/miniwob-plusplus/train_custom.py
+                python: CPython 3.10.12
+                root: /home/cau/Documents/miniwob-plusplus
+                startedAt: "2025-08-14T10:22:21.201559Z"
+                writerId: wxfkm607wdkmu71u8cvudpnoinkkljsh
+        m: []
+        python_version: 3.10.12
+        t:
+            "1":
+                - 1
+                - 2
+                - 3
+                - 49
+            "2":
+                - 1
+                - 2
+                - 3
+                - 49
+            "3":
+                - 1
+                - 16
+                - 22
+                - 35
+            "4": 3.10.12
+            "5": 0.21.1
+            "12": 0.21.1
+            "13": linux-x86_64
+action_noise:
+    value: None
+action_space:
+    value: Box(0.0, 1.0, (2,), float32)
+algo:
+    value: PPO
+batch_size:
+    value: 64
+clip_range:
+    value: <function get_schedule_fn.<locals>.<lambda> at 0x7ac6dfdd9bd0>
+clip_range_vf:
+    value: None
+device:
+    value: cuda
+ent_coef:
+    value: 0
+env:
+    value: <stable_baselines3.common.vec_env.vec_transpose.VecTransposeImage object at 0x7aca992392a0>
+env_name:
+    value: MiniWoBClickImageEnv
+ep_info_buffer:
+    value: deque([], maxlen=100)
+ep_success_buffer:
+    value: deque([], maxlen=100)
+gae_lambda:
+    value: 0.95
+gamma:
+    value: 0.99
+learning_rate:
+    value: 0.0003
+lr_schedule:
+    value: <function get_schedule_fn.<locals>.<lambda> at 0x7ac912ca8c10>
+max_grad_norm:
+    value: 0.5
+n_envs:
+    value: 1
+n_epochs:
+    value: 10
+n_steps:
+    value: 256
+normalize_advantage:
+    value: "True"
+num_timesteps:
+    value: 0
+observation_space:
+    value: Box(0, 255, (3, 210, 160), uint8)
+policy:
+    value: |-
+        ActorCriticCnnPolicy(
+          (features_extractor): NatureCNN(
+            (cnn): Sequential(
+              (0): Conv2d(3, 32, kernel_size=(8, 8), stride=(4, 4))
+              (1): ReLU()
+              (2): Conv2d(32, 64, kernel_size=(4, 4), stride=(2, 2))
+              (3): ReLU()
+              (4): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1))
+              (5): ReLU()
+              (6): Flatten(start_dim=1, end_dim=-1)
+            )
+            (linear): Sequential(
+              (0): Linear(in_features=22528, out_features=512, bias=True)
+              (1): ReLU()
+            )
+          )
+          (pi_features_extractor): NatureCNN(
+            (cnn): Sequential(
+              (0): Conv2d(3, 32, kernel_size=(8, 8), stride=(4, 4))
+              (1): ReLU()
+              (2): Conv2d(32, 64, kernel_size=(4, 4), stride=(2, 2))
+              (3): ReLU()
+              (4): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1))
+              (5): ReLU()
+              (6): Flatten(start_dim=1, end_dim=-1)
+            )
+            (linear): Sequential(
+              (0): Linear(in_features=22528, out_features=512, bias=True)
+              (1): ReLU()
+            )
+          )
+          (vf_features_extractor): NatureCNN(
+            (cnn): Sequential(
+              (0): Conv2d(3, 32, kernel_size=(8, 8), stride=(4, 4))
+              (1): ReLU()
+              (2): Conv2d(32, 64, kernel_size=(4, 4), stride=(2, 2))
+              (3): ReLU()
+              (4): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1))
+              (5): ReLU()
+              (6): Flatten(start_dim=1, end_dim=-1)
+            )
+            (linear): Sequential(
+              (0): Linear(in_features=22528, out_features=512, bias=True)
+              (1): ReLU()
+            )
+          )
+          (mlp_extractor): MlpExtractor(
+            (policy_net): Sequential()
+            (value_net): Sequential()
+          )
+          (action_net): Linear(in_features=512, out_features=2, bias=True)
+          (value_net): Linear(in_features=512, out_features=1, bias=True)
+        )
+policy_class:
+    value: <class 'stable_baselines3.common.policies.ActorCriticCnnPolicy'>
+policy_kwargs:
+    value: '{}'
+policy_type:
+    value: CnnPolicy
+rollout_buffer:
+    value: <stable_baselines3.common.buffers.RolloutBuffer object at 0x7ac912ca4c40>
+rollout_buffer_class:
+    value: <class 'stable_baselines3.common.buffers.RolloutBuffer'>
+rollout_buffer_kwargs:
+    value: '{}'
+sde_sample_freq:
+    value: -1
+seed:
+    value: None
+start_time:
+    value: 1755166943463969274
+target_kl:
+    value: None
+tensorboard_log:
+    value: None
+total_timesteps:
+    value: 10000
+use_sde:
+    value: "False"
+verbose:
+    value: 2
+vf_coef:
+    value: 0.5
