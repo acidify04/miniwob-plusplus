@@ -58,12 +58,12 @@ class MiniWoBClickImageEnv(gym.Env):
         self.env.close()
 
 wandb.init(
-    project="miniwob-click",   # W&B 프로젝트 이름
-    config={                  # 하이퍼파라미터 기록
+    project="miniwob-click",   
+    config={                  
         "policy_type": "CnnPolicy",
-        "total_timesteps": 10000,
+        "total_timesteps": 100000,
         "env_name": "MiniWoBClickImageEnv",
-        "n_envs": 8,
+        "n_envs": 1,
         "learning_rate": 5e-5,
         "ent_coef": 0.01
     },
